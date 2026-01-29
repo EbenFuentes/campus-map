@@ -6,7 +6,6 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 <!-- PROJECT LOGO -->
@@ -53,23 +52,25 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#references">References</a></li>
   </ol>
 </details>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![CSULA Campus Map][map-screenshot](public/campus-screenshot.png)]
+![CSULA Campus Map Screenshot](public/campus-screenshot.png)
 
-An interactive campus map application for California State University, Los Angeles (CSULA) that helps students, faculty, and visitors navigate the campus. The map features clickable building polygons that display detailed information including building names, codes, nearest parking, and more.
+A modern interactive campus map for California State University, Los Angeles (CSULA) that helps students, faculty, and visitors navigate the campus. This project provides accurate and informative data for each building, parking structure, and facility on campus through an intuitive, clickable interface.
 
-Key features:
-* Interactive building polygons overlaid on campus map
-* Click on buildings to view detailed information
-* Building names, codes, and types
-* Nearest parking information for each building
-* Clean, responsive interface built with Vue.js and TailwindCSS
+The current CSULA campus map is a static PDF image that makes it difficult to quickly find building information or plan routes. This project modernizes the campus navigation experience by providing:
+
+* **Interactive building polygons** - Click any building to view detailed information
+* **Detailed information** - Building names, codes, departments, and nearest parking
+* **Modern web interface** - Fast, responsive, and mobile-friendly
+* **Accurate geospatial data** - Precise building locations and footprints
+
+Whether you're a new student trying to find your first class, a visitor looking for parking, or faculty planning your daily route, this map makes campus navigation simple and efficient.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -120,9 +121,7 @@ This project requires Node.js version 20.19.0 or 22.12.0+
 The application displays an interactive map centered on the CSULA campus. Users can:
 
 1. **Navigate the map** - Zoom and pan to explore different areas of campus
-2. **Click on buildings** - Tap or click any building polygon to view details
-3. **View building information** - See building names, codes, types, and nearest parking
-4. **Search buildings** (coming soon) - Quickly find specific buildings by name or code
+
 
 The map data is stored in GeoJSON format (`public/campus-v0.geojson`) and includes properties for each building such as:
 - Building name
@@ -136,15 +135,13 @@ The map data is stored in GeoJSON format (`public/campus-v0.geojson`) and includ
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Interactive map with clickable buildings
-- [x] Building popups with basic information
+- [ ] Interactive map with clickable buildings
+- [ ] Building popups with basic information
 - [ ] Building photos and images
 - [ ] Search functionality
 - [ ] Filter by building type
 - [ ] Parking lot highlighting
-- [ ] Directions between buildings
 - [ ] Mobile-responsive design improvements
-- [ ] Dark mode support
 
 See the [open issues](https://github.com/EbenFuentes/campus-map/issues) for a full list of proposed features (and known issues).
 
@@ -171,14 +168,14 @@ Don't forget to give the project a star! Thanks again!
 <!-- CONTACT -->
 ## Contact
 
-Eben Fuentes - [LinkedIn](https://linkedin.com/in/ebenfuentes) - your.email@example.com
+Eben Fuentes - [LinkedIn](https://linkedin.com/in/eben-fuentes) - eben.fuentes@gmail.com
 
 Project Link: [https://github.com/EbenFuentes/campus-map](https://github.com/EbenFuentes/campus-map)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
+<!-- References -->
+## References
 
 * [MapLibre GL JS](https://maplibre.org/) - Open-source mapping library
 * [OpenStreetMap](https://www.openstreetmap.org/) - Building footprint data source
@@ -197,8 +194,6 @@ Project Link: [https://github.com/EbenFuentes/campus-map](https://github.com/Ebe
 [stars-url]: https://github.com/EbenFuentes/campus-map/stargazers
 [issues-shield]: https://img.shields.io/github/issues/EbenFuentes/campus-map.svg?style=for-the-badge
 [issues-url]: https://github.com/EbenFuentes/campus-map/issues
-[license-shield]: https://img.shields.io/github/license/EbenFuentes/campus-map.svg?style=for-the-badge
-[license-url]: https://github.com/EbenFuentes/campus-map/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/ebenfuentes
 [map-screenshot]: public/campus-screenshot.png
