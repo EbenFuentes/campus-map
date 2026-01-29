@@ -3,10 +3,18 @@ import { onMounted, ref } from 'vue'
 import maplibregl from 'maplibre-gl'
 
 const map = ref(null)
+const showBuildings = ref(true)
+
+const toggleBuildings = () => {
+    showBuildings.value = !showBuildings.value
+    const visibility = showBuildings.value ? 'visible' : 'none'
+
+    map.value.setLayoutProperty('building-fills', 'visibility', visibility)
+    map.value.setLayoutProperty('building-outlines', 'visibility', visibility)
+}
 
 onMounted(() => {
-  
-  map.value = new maplibregl.Map({
+    map.value = new maplibregl.Map({
         container: 'map',
         style: 'https://tiles.openfreemap.org/styles/liberty',
         center: [-118.16848, 34.06639],
@@ -14,16 +22,69 @@ onMounted(() => {
         maplibreLogo: true
     });
 
-})
+    map.value.on('load', () => {
+        map.value.getCanvas().style.cursor = 'crosshair'
+
+        map.value.addSource('buildings', {
+            type: 'geojson',
+            data: '/campus-v0.geojson'
+        });
+
+        map.value.addLayer({
+            id: 'building-fills',
+            type: 'fill',
+            source: 'buildings',
+            paint: {
+                'fill-color': '#ffce00',
+                'fill-opacity': 0.5
+            }
+        });
+
+        map.value.addLayer({
+            id: 'building-outlines',
+            type: 'line',
+            source: 'buildings',
+            paint: {
+                'line-color': '#000',
+                'line-width': 2
+            }
+        });
+
+
+        map.value.on('mouseenter', 'building-fills', () => {
+            map.value.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.value.on('mouseleave', 'building-fills', () => {
+            map.value.getCanvas().style.cursor = 'crosshair';
+        });
+
+        map.value.on('click', 'building-fills', (e) => {
+            const feature = e.features[0];
+            const props = feature.properties;
+
+            console.log('Clicked building:', props);
+
+            new maplibregl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML(`
+            <h3>${props.name || 'Unnamed Building'}</h3>
+        `)
+                .addTo(map.value);
+        });
+    });
+});
 </script>
 
 <template>
+    <div class="relative h-full m-0 p-0">
+        <div id="map" class="h-full"></div>
 
-    <div id="map" class="h-full m-0 p-0">
+        <button @click="toggleBuildings"
+            class="absolute top-4 right-4 bg-white px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 transition-colors z-10 font-medium">
+            {{ showBuildings ? 'Hide Buildings' : 'Show Buildings' }}
+        </button>
     </div>
-
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
