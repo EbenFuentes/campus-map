@@ -14,7 +14,7 @@ const toggleBuildings = () => {
 }
 
 onMounted(() => {
-    
+
     const bounds = [
         [-118.1888, 34.0616], // Southwest coordinates
         [-118.1561, 34.0769] // Northeast coordinates
@@ -29,21 +29,22 @@ onMounted(() => {
         maxBounds: bounds
     });
 
-    
 
+    let hoveredBuildingId = null;
     map.value.on('load', () => {
 
         map.value.addControl(new maplibregl.NavigationControl({
-        visualizePitch: true,
-        visualizeRoll: true,
-        showZoom: true,
-        showCompass: true
-    }));
+            visualizePitch: true,
+            visualizeRoll: true,
+            showZoom: true,
+            showCompass: true
+        }));
         map.value.getCanvas().style.cursor = 'crosshair'
 
         map.value.addSource('buildings', {
             type: 'geojson',
-            data: '/campus-v0.geojson'
+            data: '/campus-v0.geojson',
+            generateId: true
         });
 
         map.value.addLayer({
@@ -52,7 +53,12 @@ onMounted(() => {
             source: 'buildings',
             paint: {
                 'fill-color': '#ffce00',
-                'fill-opacity': 0.5
+                'fill-opacity': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false],
+                    1,
+                    0.5
+                ]
             }
         });
 
@@ -66,28 +72,73 @@ onMounted(() => {
             }
         });
 
+        const popup = new maplibregl.Popup({
+            closeButton: false,
+            closeOnClick: false
+        });
 
-        map.value.on('mouseenter', 'building-fills', () => {
+        let currentFeatureCoordinates = undefined;
+        map.value.on('mousemove', 'building-fills', (e) => {
             map.value.getCanvas().style.cursor = 'pointer';
+
+            // popup on hover effect logic for building names
+            const featureId = e.features[0].id;
+            if (currentFeatureCoordinates !== featureId) {
+                currentFeatureCoordinates = featureId;
+
+                const name = e.features[0].properties.name || 'Unnamed Building';
+
+                // calculate polygon center
+                const coordinates = e.features[0].geometry.coordinates[0];
+
+                let minLng = Infinity, maxLng = -Infinity;
+                let minLat = Infinity, maxLat = -Infinity;
+
+                coordinates.forEach(([lng, lat]) => {
+                    minLng = Math.min(minLng, lng);
+                    maxLng = Math.max(maxLng, lng);
+                    minLat = Math.min(minLat, lat);
+                    maxLat = Math.max(maxLat, lat);
+                });
+
+                const centerLng = (minLng + maxLng) / 2;
+                const centerLat = (minLat + maxLat) / 2;
+
+                popup.setLngLat([centerLng, centerLat]).setText(name).addTo(map.value);
+            }
+
+            // building hover effect logic
+            if (e.features.length > 0) {
+                if (hoveredBuildingId !== null) {
+                    map.value.setFeatureState(
+                        { source: 'buildings', id: hoveredBuildingId },
+                        { hover: false }
+                    );
+                }
+                hoveredBuildingId = e.features[0].id;
+                map.value.setFeatureState(
+                    { source: 'buildings', id: hoveredBuildingId },
+                    { hover: true }
+                );
+            }
         });
 
         map.value.on('mouseleave', 'building-fills', () => {
             map.value.getCanvas().style.cursor = 'crosshair';
+
+            currentFeatureCoordinates = undefined;
+            popup.remove();
+
+            // remove hover state
+            if (hoveredBuildingId !== null) {
+                map.value.setFeatureState(
+                    { source: 'buildings', id: hoveredBuildingId },
+                    { hover: false }
+                );
+            }
+            hoveredBuildingId = null;
         });
 
-        map.value.on('click', 'building-fills', (e) => {
-            const feature = e.features[0];
-            const props = feature.properties;
-
-            console.log('Clicked building:', props);
-
-            new maplibregl.Popup()
-                .setLngLat(e.lngLat)
-                .setHTML(`
-            <h3>${props.name || 'Unnamed Building'}</h3>
-        `)
-                .addTo(map.value);
-        });
     });
 });
 </script>
