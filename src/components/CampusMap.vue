@@ -43,7 +43,7 @@ onMounted(() => {
 
         map.value.addSource('buildings', {
             type: 'geojson',
-            data: '/campus-v0.geojson',
+            data: '/campus-v0.1.geojson',
             generateId: true
         });
 
