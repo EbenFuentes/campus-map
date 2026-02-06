@@ -101,7 +101,12 @@ onMounted(() => {
             type: 'symbol',
             source: 'buildings',
             layout: {
-                'text-field': ['get', 'name'],
+                'text-field': [
+                    'case',
+                    ['has', 'wing'],
+                    ['concat', ['get', 'buildingCode'], ' Wing ', ['get', 'wing']],
+                    ['get', 'name']
+                ],
                 'text-size': 12,
                 'text-anchor': 'center',
                 'text-justify': 'center',
