@@ -95,6 +95,26 @@ onMounted(() => {
             }
         });
 
+        // 3rd layer: labels for building names
+        map.value.addLayer({
+            id: 'building-labels',
+            type: 'symbol',
+            source: 'buildings',
+            layout: {
+                'text-field': ['get', 'name'],
+                'text-size': 12,
+                'text-anchor': 'center',
+                'text-justify': 'center',
+                'text-allow-overlap': false,
+                'text-optional': true
+            },
+            paint: {
+                'text-color': '#000',
+                'text-halo-color': '#fff',
+                'text-halo-width': 1.5
+            }
+        });
+
         const popup = new maplibregl.Popup({
             closeButton: false,
             closeOnClick: false
