@@ -221,4 +221,8 @@ onMounted(() => {
 :deep(.maplibregl-popup) {
     pointer-events: none;
 }
+
+:deep(.maplibregl-popup-tip) {
+    display: none;
+}
 </style>
