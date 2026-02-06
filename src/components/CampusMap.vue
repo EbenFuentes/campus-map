@@ -5,6 +5,27 @@ import maplibregl from 'maplibre-gl'
 const map = ref(null)
 const showBuildings = ref(true)
 
+const getBounds = (coordinates) => {
+    let minLng = Infinity, maxLng = -Infinity;
+    let minLat = Infinity, maxLat = -Infinity;
+
+    coordinates.forEach((coord) => {
+        const lng = coord[0];
+        const lat = coord[1];
+        if (typeof lng === 'number' && typeof lat === 'number') {
+            minLng = Math.min(minLng, lng);
+            maxLng = Math.max(maxLng, lng);
+            minLat = Math.min(minLat, lat);
+            maxLat = Math.max(maxLat, lat);
+        }
+    });
+
+    return {
+        centerLng: (minLng + maxLng) / 2,
+        centerLat: (minLat + maxLat) / 2
+    };
+}
+
 const toggleBuildings = () => {
     showBuildings.value = !showBuildings.value
     const visibility = showBuildings.value ? 'visible' : 'none'
@@ -43,10 +64,22 @@ onMounted(() => {
 
         map.value.addSource('buildings', {
             type: 'geojson',
-            data: '/campus-v0.1.geojson',
+            data: '/campus.geojson',
             generateId: true
         });
 
+        // 1st layer: outline
+        map.value.addLayer({
+            id: 'building-outlines',
+            type: 'line',
+            source: 'buildings',
+            paint: {
+                'line-color': '#000',
+                'line-width': 2
+            }
+        });
+
+        // 2nd layer: fill
         map.value.addLayer({
             id: 'building-fills',
             type: 'fill',
@@ -59,16 +92,6 @@ onMounted(() => {
                     1,
                     0.5
                 ]
-            }
-        });
-
-        map.value.addLayer({
-            id: 'building-outlines',
-            type: 'line',
-            source: 'buildings',
-            paint: {
-                'line-color': '#000',
-                'line-width': 2
             }
         });
 
@@ -88,23 +111,38 @@ onMounted(() => {
 
                 const name = e.features[0].properties.name || 'Unnamed Building';
 
-                // calculate polygon center
-                const coordinates = e.features[0].geometry.coordinates[0];
+                // calculate polygon center for Polygon, MultiPolygon, and Point
+                const geometry = e.features[0].geometry;
+                let centerLng, centerLat;
 
-                let minLng = Infinity, maxLng = -Infinity;
-                let minLat = Infinity, maxLat = -Infinity;
+                if (geometry.type === 'Point') {
+                    // Point: coordinates is [lng, lat]
+                    centerLng = geometry.coordinates[0];
+                    centerLat = geometry.coordinates[1];
+                } else if (geometry.type === 'MultiPolygon') {
+                    // MultiPolygon: coordinates[0][0] is the outer ring of the first polygon
+                    const coordinates = geometry.coordinates[0]?.[0];
+                    if (coordinates && coordinates.length > 0) {
+                        const bounds = getBounds(coordinates);
+                        centerLng = bounds.centerLng;
+                        centerLat = bounds.centerLat;
+                    }
+                } else if (geometry.type === 'Polygon') {
+                    // Polygon: coordinates[0] is the outer ring
+                    const coordinates = geometry.coordinates[0];
+                    if (coordinates && coordinates.length > 0) {
+                        const bounds = getBounds(coordinates);
+                        centerLng = bounds.centerLng;
+                        centerLat = bounds.centerLat;
+                    }
+                }
 
-                coordinates.forEach(([lng, lat]) => {
-                    minLng = Math.min(minLng, lng);
-                    maxLng = Math.max(maxLng, lng);
-                    minLat = Math.min(minLat, lat);
-                    maxLat = Math.max(maxLat, lat);
-                });
-
-                const centerLng = (minLng + maxLng) / 2;
-                const centerLat = (minLat + maxLat) / 2;
-
-                popup.setLngLat([centerLng, centerLat]).setText(name).addTo(map.value);
+                // Only show popup if we have valid coordinates
+                if (centerLng && centerLat && !isNaN(centerLng) && !isNaN(centerLat)) {
+                    popup.setLngLat([centerLng, centerLat]).setText(name).addTo(map.value);
+                } else {
+                    popup.setLngLat(e.lngLat).setText(name).addTo(map.value);
+                }
             }
 
             // building hover effect logic
