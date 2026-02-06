@@ -192,4 +192,33 @@ onMounted(() => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(.maplibregl-popup-content) {
+    background-color: #000;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 0;
+
+}
+
+
+:deep(.maplibregl-popup-anchor-bottom .maplibregl-popup-tip) {
+    border-top-color: #000;
+}
+
+:deep(.maplibregl-popup-anchor-top .maplibregl-popup-tip) {
+    border-bottom-color: #000;
+}
+
+:deep(.maplibregl-popup-anchor-left .maplibregl-popup-tip) {
+    border-right-color: #000;
+}
+
+:deep(.maplibregl-popup-anchor-right .maplibregl-popup-tip) {
+    border-left-color: #000;
+}
+
+:deep(.maplibregl-popup) {
+    pointer-events: none;
+}
+</style>
